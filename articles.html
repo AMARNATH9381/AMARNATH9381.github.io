@@ -93,33 +93,43 @@
             background: #27ca3f;
         }
 
-        .nav-links {
+        /* Navigation Button */
+        .nav-btn {
             display: flex;
-            gap: 15px;
-        }
-
-        .nav-link {
-            background: transparent;
-            border: 1px solid rgba(0, 212, 255, 0.3);
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(157, 0, 255, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.5);
             color: var(--cyber-blue);
-            padding: 8px 16px;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.3s;
-            text-decoration: none;
             font-family: 'JetBrains Mono', monospace;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
         }
 
-        .nav-link:hover {
-            background: rgba(0, 212, 255, 0.1);
+        .nav-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(157, 0, 255, 0.2));
             border-color: var(--cyber-blue);
             box-shadow: var(--glow-blue);
+            transform: translateY(-2px);
         }
 
-        .nav-link.active {
-            background: rgba(0, 212, 255, 0.2);
-            border-color: var(--cyber-blue);
+        .nav-btn i {
+            font-size: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .nav-btn span {
+                display: none;
+            }
+
+            .nav-btn {
+                padding: 10px 14px;
+            }
         }
 
         /* Main Container */
@@ -395,14 +405,10 @@
             <span class="dot yellow"></span>
             <span class="dot green"></span>
         </div>
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">
-                <i class="fas fa-home"></i> Home
-            </a>
-            <a href="articles.html" class="nav-link active">
-                <i class="fas fa-newspaper"></i> Articles
-            </a>
-        </div>
+        <a href="index.html" class="nav-btn">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
     </div>
 
     <!-- Main Content -->

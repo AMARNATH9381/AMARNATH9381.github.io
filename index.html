@@ -184,65 +184,43 @@
             background: #27ca3f;
         }
 
-        /* Menu Icon */
-        .menu-icon {
-            background: transparent;
-            border: 1px solid rgba(0, 212, 255, 0.3);
+        /* Navigation Button */
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(157, 0, 255, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.5);
             color: var(--cyber-blue);
-            padding: 8px;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            text-decoration: none;
             transition: all 0.3s;
-            position: relative;
+            font-weight: 500;
         }
 
-        .menu-icon:hover {
-            background: rgba(0, 212, 255, 0.1);
+        .nav-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(157, 0, 255, 0.2));
             border-color: var(--cyber-blue);
             box-shadow: var(--glow-blue);
             transform: translateY(-2px);
         }
 
-        /* Dropdown Menu */
-        .menu-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 10px;
-            background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 5px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s;
-            z-index: 1000;
+        .nav-btn i {
+            font-size: 16px;
         }
 
-        .menu-icon:hover .menu-dropdown {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
+        @media (max-width: 480px) {
+            .nav-btn span {
+                display: none;
+            }
 
-        .menu-item {
-            display: block;
-            padding: 12px 20px;
-            color: var(--cyber-light);
-            text-decoration: none;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .menu-item:hover {
-            color: var(--cyber-blue);
-            background: rgba(0, 212, 255, 0.1);
-            text-shadow: var(--glow-blue);
+            .nav-btn {
+                padding: 10px 14px;
+            }
         }
 
 
@@ -1497,12 +1475,10 @@
             </div>
         </div>
 
-        <div class="menu-icon">
-            <i class="fas fa-bars"></i>
-            <div class="menu-dropdown">
-                <a href="articles.html" class="menu-item">Articles</a>
-            </div>
-        </div>
+        <a href="articles.html" class="nav-btn">
+            <i class="fas fa-newspaper"></i>
+            <span>Articles</span>
+        </a>
     </div>
 
     <!-- Skill Tooltip -->
