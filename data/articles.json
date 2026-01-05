@@ -1,0 +1,14 @@
+{
+  "articles": [
+    {
+      "id": "sample-devops-article",
+      "title": "Getting Started with Docker Containers",
+      "category": "docker",
+      "description": "A comprehensive guide to understanding Docker containers, images, and basic commands for DevOps workflows.",
+      "content": "<h2>Introduction to Docker</h2><p>Docker is a platform that enables developers to build, ship, and run applications in containers. Containers are lightweight, standalone, executable packages that include everything needed to run a piece of software.</p><h3>Key Concepts</h3><ul><li><strong>Images:</strong> Read-only templates used to create containers</li><li><strong>Containers:</strong> Running instances of images</li><li><strong>Dockerfile:</strong> Script containing instructions to build an image</li></ul><h3>Basic Commands</h3><p>Here are some essential Docker commands:</p><pre><code>docker pull nginx\ndocker run -d -p 80:80 nginx\ndocker ps\ndocker stop container_id</code></pre><h3>Conclusion</h3><p>Docker simplifies deployment and ensures consistency across different environments.</p>",
+      "images": [],
+      "createdAt": "2026-01-05T12:00:00Z",
+      "updatedAt": "2026-01-05T12:00:00Z"
+    }
+  ]
+}

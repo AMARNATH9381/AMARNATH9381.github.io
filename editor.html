@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMARNATH.M >> Article Editor</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Quill Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cyber-blue: #00d4ff;
+            --cyber-purple: #9d00ff;
+            --cyber-green: #00ff9d;
+            --cyber-black: #0a0a0a;
+            --cyber-gray: #1a1a1a;
+            --cyber-light: #f0f0f0;
+            --cyber-red: #ff5f56;
+            --cyber-yellow: #ffbd2e;
+            --glow-blue: 0 0 10px var(--cyber-blue), 0 0 20px var(--cyber-blue);
+            --glow-green: 0 0 10px var(--cyber-green), 0 0 20px var(--cyber-green);
+            --card-gradient: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(157, 0, 255, 0.05));
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--cyber-black);
+            color: var(--cyber-light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .cyber-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 30%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(157, 0, 255, 0.05) 0%, transparent 50%),
+                linear-gradient(to bottom, #0a0a0a, #050505);
+        }
+
+        /* Header */
+        .terminal-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.red {
+            background: #ff5f56;
+        }
+
+        .dot.yellow {
+            background: #ffbd2e;
+        }
+
+        .dot.green {
+            background: #27ca3f;
+        }
+
+        .header-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--cyber-blue);
+            font-size: 1.2rem;
+        }
+
+        .nav-link {
+            background: transparent;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--cyber-blue);
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .nav-link:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--cyber-blue);
+            box-shadow: var(--glow-blue);
+        }
+
+        /* Editor Container */
+        .editor-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            margin-top: 70px;
+        }
+
+        /* Form Sections */
+        .form-section {
+            background: var(--card-gradient);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-section h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--cyber-blue);
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--cyber-green);
+            margin-bottom: 8px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 6px;
+            color: var(--cyber-light);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--cyber-blue);
+            box-shadow: var(--glow-blue);
+        }
+
+        .form-input::placeholder {
+            color: rgba(240, 240, 240, 0.4);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 6px;
+            color: var(--cyber-light);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .form-select option {
+            background: var(--cyber-black);
+            color: var(--cyber-light);
+        }
+
+        /* Quill Editor Styling */
+        .editor-wrapper {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .ql-toolbar.ql-snow {
+            background: rgba(0, 0, 0, 0.3);
+            border: none;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .ql-container.ql-snow {
+            border: none;
+            min-height: 400px;
+        }
+
+        .ql-editor {
+            color: var(--cyber-light);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .ql-editor.ql-blank::before {
+            color: rgba(240, 240, 240, 0.4);
+            font-style: normal;
+        }
+
+        .ql-snow .ql-stroke {
+            stroke: var(--cyber-blue);
+        }
+
+        .ql-snow .ql-fill {
+            fill: var(--cyber-blue);
+        }
+
+        .ql-snow .ql-picker {
+            color: var(--cyber-light);
+        }
+
+        .ql-snow .ql-picker-options {
+            background: var(--cyber-gray);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .ql-toolbar.ql-snow .ql-picker-label:hover,
+        .ql-toolbar.ql-snow .ql-picker-label.ql-active,
+        .ql-toolbar.ql-snow .ql-picker-item:hover,
+        .ql-toolbar.ql-snow .ql-picker-item.ql-selected,
+        .ql-toolbar.ql-snow button:hover,
+        .ql-toolbar.ql-snow button.ql-active {
+            color: var(--cyber-green);
+        }
+
+        .ql-toolbar.ql-snow button:hover .ql-stroke,
+        .ql-toolbar.ql-snow button.ql-active .ql-stroke {
+            stroke: var(--cyber-green);
+        }
+
+        .ql-toolbar.ql-snow button:hover .ql-fill,
+        .ql-toolbar.ql-snow button.ql-active .ql-fill {
+            fill: var(--cyber-green);
+        }
+
+        /* Image Upload Section */
+        .image-upload-area {
+            border: 2px dashed rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--cyber-blue);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .image-upload-area.dragover {
+            border-color: var(--cyber-green);
+            background: rgba(0, 255, 157, 0.1);
+        }
+
+        .image-upload-area i {
+            font-size: 3rem;
+            color: var(--cyber-blue);
+            margin-bottom: 15px;
+        }
+
+        .image-upload-area p {
+            color: rgba(240, 240, 240, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .image-upload-area span {
+            color: var(--cyber-blue);
+            font-size: 12px;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        /* Image Preview Grid */
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .image-preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .image-remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 95, 86, 0.9);
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .image-remove-btn:hover {
+            background: var(--cyber-red);
+            transform: scale(1.1);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-purple));
+            color: var(--cyber-black);
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            box-shadow: var(--glow-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--cyber-green);
+            color: var(--cyber-green);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 157, 0.1);
+            box-shadow: var(--glow-green);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 2px solid var(--cyber-red);
+            color: var(--cyber-red);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 95, 86, 0.1);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--cyber-gray);
+            border: 1px solid var(--cyber-green);
+            color: var(--cyber-light);
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2000;
+            transition: transform 0.3s;
+            box-shadow: var(--glow-green);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.error {
+            border-color: var(--cyber-red);
+            box-shadow: 0 0 10px var(--cyber-red);
+        }
+
+        /* Export Modal */
+        .export-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .export-modal.active {
+            display: flex;
+        }
+
+        .export-content {
+            background: var(--cyber-gray);
+            border: 2px solid var(--cyber-blue);
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .export-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .export-header h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--cyber-blue);
+        }
+
+        .export-close {
+            background: transparent;
+            border: none;
+            color: var(--cyber-blue);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .export-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .export-code {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--cyber-green);
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .export-actions {
+            padding: 20px;
+            border-top: 1px solid rgba(0, 212, 255, 0.3);
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .export-info {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: rgba(240, 240, 240, 0.8);
+        }
+
+        .export-info i {
+            color: var(--cyber-blue);
+            margin-right: 8px;
+        }
+
+        /* Article List for Editing */
+        .article-list {
+            margin-top: 20px;
+        }
+
+        .article-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .article-list-item:hover {
+            border-color: var(--cyber-blue);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .article-list-item .title {
+            font-weight: bold;
+            color: var(--cyber-light);
+        }
+
+        .article-list-item .meta {
+            font-size: 12px;
+            color: rgba(240, 240, 240, 0.5);
+        }
+
+        .article-list-item .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .article-list-item .edit-btn,
+        .article-list-item .delete-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .article-list-item .edit-btn {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--cyber-blue);
+        }
+
+        .article-list-item .delete-btn {
+            background: rgba(255, 95, 86, 0.2);
+            color: var(--cyber-red);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .editor-container {
+                padding: 20px 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cyber-bg"></div>
+
+    <!-- Header -->
+    <div class="terminal-header">
+        <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+        </div>
+        <span class="header-title">Article Editor</span>
+        <a href="articles.html" class="nav-link">
+            <i class="fas fa-arrow-left"></i> Back to Articles
+        </a>
+    </div>
+
+    <!-- Editor Container -->
+    <div class="editor-container">
+        <!-- Article Metadata -->
+        <div class="form-section">
+            <h3><i class="fas fa-info-circle"></i> Article Details</h3>
+            <div class="form-group">
+                <label class="form-label">Title *</label>
+                <input type="text" id="articleTitle" class="form-input" placeholder="Enter article title...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Category *</label>
+                <select id="articleCategory" class="form-select">
+                    <option value="">Select a category...</option>
+                    <option value="linux">Linux</option>
+                    <option value="docker">Docker</option>
+                    <option value="kubernetes">Kubernetes</option>
+                    <option value="cicd">CI/CD</option>
+                    <option value="git">Git</option>
+                    <option value="networking">Networking</option>
+                    <option value="aws">AWS</option>
+                    <option value="azure">Azure</option>
+                    <option value="devops">DevOps</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Short Description *</label>
+                <textarea id="articleDescription" class="form-input" placeholder="Brief description of the article..."
+                    rows="3"></textarea>
+            </div>
+        </div>
+
+        <!-- Rich Text Editor -->
+        <div class="form-section">
+            <h3><i class="fas fa-edit"></i> Article Content</h3>
+            <div class="editor-wrapper">
+                <div id="editor"></div>
+            </div>
+        </div>
+
+        <!-- Image Upload -->
+        <div class="form-section">
+            <h3><i class="fas fa-images"></i> Screenshots</h3>
+            <div class="image-upload-area" id="dropZone" onclick="document.getElementById('imageInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag & drop images here or click to upload</p>
+                <span>Supports: JPG, PNG, GIF (Max 5MB each)</span>
+            </div>
+            <input type="file" id="imageInput" multiple accept="image/*">
+            <div class="image-preview-grid" id="imagePreviewGrid"></div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="saveArticle()">
+                <i class="fas fa-save"></i> Save Article
+            </button>
+            <button class="btn btn-secondary" onclick="exportArticles()">
+                <i class="fas fa-download"></i> Export JSON
+            </button>
+            <button class="btn btn-danger" onclick="clearForm()">
+                <i class="fas fa-trash"></i> Clear
+            </button>
+        </div>
+
+        <!-- Saved Articles List -->
+        <div class="form-section" style="margin-top: 40px;">
+            <h3><i class="fas fa-list"></i> Saved Articles</h3>
+            <div class="article-list" id="articleList">
+                <!-- Articles will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="export-modal" id="exportModal">
+        <div class="export-content">
+            <div class="export-header">
+                <h3><i class="fas fa-code"></i> Export Articles JSON</h3>
+                <button class="export-close" onclick="closeExportModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="export-body">
+                <div class="export-info">
+                    <i class="fas fa-info-circle"></i>
+                    Copy this JSON and save it to <code>data/articles.json</code> in your repository, then commit the
+                    changes.
+                </div>
+                <div class="export-code" id="exportCode"></div>
+            </div>
+            <div class="export-actions">
+                <button class="btn btn-secondary" onclick="copyExportCode()">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+                <button class="btn btn-primary" onclick="downloadJSON()">
+                    <i class="fas fa-download"></i> Download File
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Article saved!</span>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        let quill;
+        let uploadedImages = [];
+        let editingArticleId = null;
+        let articlesCache = [];
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            initQuillEditor();
+            setupImageUpload();
+            loadSavedArticles();
+            checkForEditMode();
+        });
+
+        function initQuillEditor() {
+            quill = new Quill('#editor', {
+                theme: 'snow',
+                placeholder: 'Write your article content here...',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'indent': '-1' }, { 'indent': '+1' }],
+                        ['blockquote', 'code-block'],
+                        ['link'],
+                        ['clean']
+                    ]
+                }
+            });
+        }
+
+        function setupImageUpload() {
+            const dropZone = document.getElementById('dropZone');
+            const imageInput = document.getElementById('imageInput');
+
+            // Drag and drop handlers
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            // File input handler
+            imageInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) {
+                    showToast('Only image files are allowed', true);
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('Image size must be less than 5MB', true);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedImages.push(e.target.result);
+                    renderImagePreviews();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderImagePreviews() {
+            const grid = document.getElementById('imagePreviewGrid');
+            grid.innerHTML = uploadedImages.map((img, index) => `
+                <div class="image-preview-item">
+                    <img src="${img}" alt="Preview ${index + 1}">
+                    <button class="image-remove-btn" onclick="removeImage(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            renderImagePreviews();
+        }
+
+        async function checkForEditMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get('id');
+
+            if (articleId) {
+                await loadArticleForEdit(articleId);
+            }
+        }
+
+        async function loadArticleForEdit(articleId) {
+            try {
+                showToast('Loading article...');
+                const article = await getArticleById(articleId);
+
+                if (article) {
+                    editingArticleId = articleId;
+                    document.getElementById('articleTitle').value = article.title;
+                    document.getElementById('articleCategory').value = article.category;
+                    document.getElementById('articleDescription').value = article.description;
+                    quill.root.innerHTML = article.content;
+                    uploadedImages = article.images || [];
+                    renderImagePreviews();
+                    showToast('Article loaded for editing');
+                } else {
+                    showToast('Article not found', true);
+                }
+            } catch (error) {
+                console.error('Error loading article:', error);
+                showToast('Error loading article', true);
+            }
+        }
+
+        async function saveArticleToFirebase() {
+            const title = document.getElementById('articleTitle').value.trim();
+            const category = document.getElementById('articleCategory').value;
+            const description = document.getElementById('articleDescription').value.trim();
+            const content = quill.root.innerHTML;
+
+            // Validation
+            if (!title) {
+                showToast('Please enter a title', true);
+                return;
+            }
+            if (!category) {
+                showToast('Please select a category', true);
+                return;
+            }
+            if (!description) {
+                showToast('Please enter a description', true);
+                return;
+            }
+            if (quill.getText().trim().length < 10) {
+                showToast('Please add more content', true);
+                return;
+            }
+
+            const articleData = {
+                title,
+                category,
+                description,
+                content,
+                images: uploadedImages
+            };
+
+            try {
+                showToast('Saving to database...');
+
+                if (editingArticleId) {
+                    // Update existing article
+                    await updateArticle(editingArticleId, articleData);
+                    showToast('Article updated successfully!');
+                } else {
+                    // Create new article
+                    const newId = await saveArticle(articleData);
+                    showToast('Article saved successfully!');
+                    clearForm();
+                }
+
+                await loadSavedArticles();
+            } catch (error) {
+                console.error('Error saving article:', error);
+                showToast('Error saving article: ' + error.message, true);
+            }
+        }
+
+        // Alias for the save button
+        function saveArticle() {
+            saveArticleToFirebase();
+        }
+
+        async function loadSavedArticles() {
+            const listContainer = document.getElementById('articleList');
+
+            try {
+                listContainer.innerHTML = '<p style="color: rgba(240, 240, 240, 0.5); text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading articles...</p>';
+
+                articlesCache = await getAllArticles();
+
+                if (articlesCache.length === 0) {
+                    listContainer.innerHTML = '<p style="color: rgba(240, 240, 240, 0.5); text-align: center; padding: 20px;">No articles saved yet.</p>';
+                    return;
+                }
+
+                listContainer.innerHTML = articlesCache.map(article => {
+                    let dateStr = 'No date';
+                    if (article.createdAt) {
+                        const date = article.createdAt.toDate ? article.createdAt.toDate() : new Date(article.createdAt);
+                        dateStr = date.toLocaleDateString();
+                    }
+
+                    return `
+                        <div class="article-list-item">
+                            <div>
+                                <div class="title">${article.title}</div>
+                                <div class="meta">${article.category.toUpperCase()} • ${dateStr}</div>
+                            </div>
+                            <div class="actions">
+                                <button class="edit-btn" onclick="loadArticleForEdit('${article.id}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="delete-btn" onclick="deleteArticleFromFirebase('${article.id}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading articles:', error);
+                listContainer.innerHTML = '<p style="color: var(--cyber-red); text-align: center; padding: 20px;">Error loading articles. Please refresh the page.</p>';
+            }
+        }
+
+        async function deleteArticleFromFirebase(articleId) {
+            if (!confirm('Are you sure you want to delete this article?')) {
+                return;
+            }
+
+            try {
+                showToast('Deleting article...');
+                await deleteArticle(articleId);
+
+                if (editingArticleId === articleId) {
+                    clearForm();
+                }
+
+                await loadSavedArticles();
+                showToast('Article deleted successfully!');
+            } catch (error) {
+                console.error('Error deleting article:', error);
+                showToast('Error deleting article', true);
+            }
+        }
+
+        function clearForm() {
+            editingArticleId = null;
+            document.getElementById('articleTitle').value = '';
+            document.getElementById('articleCategory').value = '';
+            document.getElementById('articleDescription').value = '';
+            quill.root.innerHTML = '';
+            uploadedImages = [];
+            renderImagePreviews();
+
+            // Clear URL params
+            window.history.replaceState({}, '', 'editor.html');
+        }
+
+        async function exportArticles() {
+            try {
+                const articles = await getAllArticles();
+
+                if (articles.length === 0) {
+                    showToast('No articles to export', true);
+                    return;
+                }
+
+                // Convert Firestore timestamps to ISO strings for export
+                const exportArticles = articles.map(article => ({
+                    ...article,
+                    createdAt: article.createdAt?.toDate ? article.createdAt.toDate().toISOString() : article.createdAt,
+                    updatedAt: article.updatedAt?.toDate ? article.updatedAt.toDate().toISOString() : article.updatedAt
+                }));
+
+                const exportData = {
+                    articles: exportArticles
+                };
+
+                const jsonString = JSON.stringify(exportData, null, 2);
+                document.getElementById('exportCode').textContent = jsonString;
+                document.getElementById('exportModal').classList.add('active');
+            } catch (error) {
+                console.error('Error exporting articles:', error);
+                showToast('Error exporting articles', true);
+            }
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.remove('active');
+        }
+
+        function copyExportCode() {
+            const code = document.getElementById('exportCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('JSON copied to clipboard!');
+            });
+        }
+
+        async function downloadJSON() {
+            const code = document.getElementById('exportCode').textContent;
+
+            const blob = new Blob([code], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'articles.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast('JSON file downloaded!');
+            closeExportModal();
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            toastMessage.textContent = message;
+            toast.classList.toggle('error', isError);
+            toast.querySelector('i').className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modal on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeExportModal();
+            }
+        });
+
+        // Close modal on outside click
+        document.getElementById('exportModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeExportModal();
+            }
+        });
+    </script>
+</body>
+
+</html>
