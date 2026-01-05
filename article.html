@@ -260,6 +260,7 @@
             padding: 20px;
             margin: 25px 0;
             overflow-x: auto;
+            position: relative;
         }
 
         .article-content pre code {
@@ -268,6 +269,36 @@
             color: var(--cyber-green);
             display: block;
             line-height: 1.6;
+        }
+
+        /* Code Copy Button */
+        .code-copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            color: var(--cyber-blue);
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .code-copy-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .code-copy-btn.copied {
+            background: rgba(0, 255, 157, 0.3);
+            border-color: var(--cyber-green);
+            color: var(--cyber-green);
         }
 
         .article-content img {
@@ -651,6 +682,54 @@
                 closeImageModal();
             }
         });
+
+        // Add copy buttons to all code blocks
+        function addCopyButtonsToCodeBlocks() {
+            const codeBlocks = document.querySelectorAll('.article-content pre');
+
+            codeBlocks.forEach((pre, index) => {
+                // Create copy button
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'code-copy-btn';
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                copyBtn.setAttribute('data-index', index);
+
+                copyBtn.addEventListener('click', async function () {
+                    const code = pre.querySelector('code');
+                    const text = code ? code.textContent : pre.textContent;
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+
+                        // Show copied state
+                        this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        this.classList.add('copied');
+
+                        // Reset after 2 seconds
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                            this.classList.remove('copied');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy:', err);
+                        this.innerHTML = '<i class="fas fa-times"></i> Failed';
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                        }, 2000);
+                    }
+                });
+
+                pre.appendChild(copyBtn);
+            });
+        }
+
+        // Call after article is rendered
+        const originalRenderArticle = renderArticle;
+        renderArticle = function (article) {
+            originalRenderArticle(article);
+            // Wait for DOM to update
+            setTimeout(addCopyButtonsToCodeBlocks, 100);
+        };
     </script>
 </body>
 
