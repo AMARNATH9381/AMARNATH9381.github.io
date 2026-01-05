@@ -909,7 +909,7 @@
                     showToast('Article updated successfully!');
                 } else {
                     // Create new article
-                    const newId = await saveArticle(articleData);
+                    const newId = await firebaseSaveArticle(articleData);
                     showToast('Article saved successfully!');
                     clearForm();
                 }

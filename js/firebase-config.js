@@ -51,7 +51,7 @@ async function getArticleById(articleId) {
 }
 
 // Save new article
-async function saveArticle(articleData) {
+async function firebaseSaveArticle(articleData) {
   try {
     const docRef = await articlesCollection.add({
       ...articleData,
