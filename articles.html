@@ -305,6 +305,7 @@
             margin-bottom: 15px;
             display: -webkit-box;
             -webkit-line-clamp: 3;
+            line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -392,6 +393,57 @@
                 max-width: 100%;
             }
         }
+
+
+
+        /* Filter Dropdown */
+        .filter-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 30px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .custom-select-wrapper {
+            position: relative;
+            min-width: 200px;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 12px 40px 12px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--cyber-blue);
+            border-radius: 8px;
+            color: var(--cyber-blue);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filter-select:hover,
+        .filter-select:focus {
+            box-shadow: var(--glow-blue);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--cyber-blue);
+            pointer-events: none;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 
@@ -418,21 +470,22 @@
             <p class="page-subtitle">DevOps Insights & Tutorials</p>
         </div>
 
-        <!-- Search and Filter -->
-        <div class="controls-section">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search articles..." oninput="searchArticles()">
-            </div>
-            <div class="filter-section">
-                <button class="filter-btn active" onclick="filterArticles('all')">All</button>
-                <button class="filter-btn" onclick="filterArticles('linux')">Linux</button>
-                <button class="filter-btn" onclick="filterArticles('docker')">Docker</button>
-                <button class="filter-btn" onclick="filterArticles('kubernetes')">Kubernetes</button>
-                <button class="filter-btn" onclick="filterArticles('cicd')">CI/CD</button>
-                <button class="filter-btn" onclick="filterArticles('git')">Git</button>
+        <!-- Filter Controls -->
+        <div class="filter-container">
+            <div class="custom-select-wrapper">
+                <select id="categoryFilter" class="filter-select" onchange="filterArticles(this.value)">
+                    <option value="all">Filter by Tool (All)</option>
+                    <option value="linux">Linux</option>
+                    <option value="docker">Docker</option>
+                    <option value="kubernetes">Kubernetes</option>
+                    <option value="cicd">CI/CD</option>
+                    <option value="git">Git</option>
+                </select>
+                <i class="fas fa-chevron-down select-arrow"></i>
             </div>
         </div>
+
+
 
         <!-- Articles Grid -->
         <div class="articles-grid" id="articlesGrid">
@@ -554,49 +607,14 @@
         function filterArticles(category) {
             currentFilter = category;
 
-            // Update active button
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Filter articles
             let filtered = articlesData;
             if (category !== 'all') {
                 filtered = articlesData.filter(article => article.category === category);
             }
-
-            // Also apply search filter if there's a search term
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            if (searchTerm) {
-                filtered = filtered.filter(article =>
-                    article.title.toLowerCase().includes(searchTerm) ||
-                    article.description.toLowerCase().includes(searchTerm)
-                );
-            }
-
             renderArticles(filtered);
         }
 
-        function searchArticles() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
-            let filtered = articlesData;
-
-            // Apply category filter
-            if (currentFilter !== 'all') {
-                filtered = filtered.filter(article => article.category === currentFilter);
-            }
-
-            // Apply search filter
-            if (searchTerm) {
-                filtered = filtered.filter(article =>
-                    article.title.toLowerCase().includes(searchTerm) ||
-                    article.description.toLowerCase().includes(searchTerm) ||
-                    article.content.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            renderArticles(filtered);
-        }
     </script>
 </body>
 

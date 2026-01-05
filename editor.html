@@ -909,18 +909,15 @@
                 <button class="btn btn-secondary" onclick="exportArticles()">
                     <i class="fas fa-download"></i> Export JSON
                 </button>
-                <button class="btn btn-danger" onclick="clearForm()">
-                    <i class="fas fa-trash"></i> Clear
+                <button class="btn btn-danger" onclick="deleteCurrentArticle()">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                <button class="btn btn-secondary" onclick="clearForm()">
+                    <i class="fas fa-eraser"></i> Clear
                 </button>
             </div>
 
-            <!-- Saved Articles List -->
-            <div class="form-section" style="margin-top: 40px;">
-                <h3><i class="fas fa-list"></i> Saved Articles</h3>
-                <div class="article-list" id="articleList">
-                    <!-- Articles will be populated by JavaScript -->
-                </div>
-            </div>
+
         </div>
 
         <!-- Export Modal -->
@@ -1075,7 +1072,6 @@
             document.addEventListener('DOMContentLoaded', function () {
                 initQuillEditor();
                 setupImageUpload();
-                loadSavedArticles();
                 checkForEditMode();
             });
 
@@ -1265,8 +1261,6 @@
 
                         // Load visibility
                         document.getElementById('articleVisibility').value = article.visibility || 'public';
-                        document.getElementById('articleAccessPassword').value = article.accessPassword || '';
-                        toggleArticlePassword();
 
                         // Set Quill content
                         if (article.content) {
@@ -1340,7 +1334,7 @@
                         clearForm();
                     }
 
-                    await loadSavedArticles();
+
                 } catch (error) {
                     console.error('Error saving article:', error);
                     showToast('Error saving article: ' + error.message, true);
@@ -1348,48 +1342,7 @@
             }
 
 
-            async function loadSavedArticles() {
-                const listContainer = document.getElementById('articleList');
 
-                try {
-                    listContainer.innerHTML = '<p style="color: rgba(240, 240, 240, 0.5); text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading articles...</p>';
-
-                    articlesCache = await getAllArticles();
-
-                    if (articlesCache.length === 0) {
-                        listContainer.innerHTML = '<p style="color: rgba(240, 240, 240, 0.5); text-align: center; padding: 20px;">No articles saved yet.</p>';
-                        return;
-                    }
-
-                    listContainer.innerHTML = articlesCache.map(article => {
-                        let dateStr = 'No date';
-                        if (article.createdAt) {
-                            const date = article.createdAt.toDate ? article.createdAt.toDate() : new Date(article.createdAt);
-                            dateStr = date.toLocaleDateString();
-                        }
-
-                        return `
-                        <div class="article-list-item">
-                            <div>
-                                <div class="title">${article.title}</div>
-                                <div class="meta">${article.category.toUpperCase()} • ${dateStr}</div>
-                            </div>
-                            <div class="actions">
-                                <button class="edit-btn" onclick="loadArticleForEdit('${article.id}')">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                                <button class="delete-btn" onclick="deleteArticleFromFirebase('${article.id}')">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    }).join('');
-                } catch (error) {
-                    console.error('Error loading articles:', error);
-                    listContainer.innerHTML = '<p style="color: var(--cyber-red); text-align: center; padding: 20px;">Error loading articles. Please refresh the page.</p>';
-                }
-            }
 
             let pendingDeleteId = null;
 
@@ -1418,7 +1371,7 @@
                         clearForm();
                     }
 
-                    await loadSavedArticles();
+
                     showToast('Article deleted successfully!');
                 } catch (error) {
                     console.error('Error deleting article:', error);
@@ -1426,11 +1379,14 @@
                 }
             }
 
-            function deleteArticleFromFirebase(articleId) {
-                // Find article title from cache
-                const article = articlesCache.find(a => a.id === articleId);
-                const title = article ? article.title : 'this article';
-                showDeleteModal(articleId, title);
+            function deleteCurrentArticle() {
+                if (!editingArticleId) {
+                    showToast('No article loaded to delete', true);
+                    return;
+                }
+                
+                const title = document.getElementById('articleTitle').value || 'this article';
+                showDeleteModal(editingArticleId, title);
             }
 
             function clearForm() {

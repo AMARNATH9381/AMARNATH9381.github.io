@@ -258,9 +258,16 @@
             border: 1px solid rgba(0, 212, 255, 0.3);
             border-radius: 8px;
             padding: 20px;
-            margin: 25px 0;
+            margin: 0;
             overflow-x: auto;
             position: relative;
+        }
+
+        .code-wrapper {
+            position: relative;
+            margin: 25px 0;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .article-content pre code {
@@ -713,11 +720,20 @@
             }
         });
 
-        // Add copy buttons to all code blocks
         function addCopyButtonsToCodeBlocks() {
             const codeBlocks = document.querySelectorAll('.article-content pre');
 
             codeBlocks.forEach((pre, index) => {
+                // Create wrapper
+                const wrapper = document.createElement('div');
+                wrapper.className = 'code-wrapper';
+
+                // Insert wrapper before pre
+                pre.parentNode.insertBefore(wrapper, pre);
+
+                // Move pre into wrapper
+                wrapper.appendChild(pre);
+
                 // Create copy button
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'code-copy-btn';
@@ -749,7 +765,7 @@
                     }
                 });
 
-                pre.appendChild(copyBtn);
+                wrapper.appendChild(copyBtn);
             });
         }
 
