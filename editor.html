@@ -681,7 +681,7 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-            <button class="btn btn-primary" onclick="saveArticle()">
+            <button class="btn btn-primary" onclick="saveArticleToFirebase()">
                 <i class="fas fa-save"></i> Save Article
             </button>
             <button class="btn btn-secondary" onclick="exportArticles()">
@@ -921,10 +921,6 @@
             }
         }
 
-        // Alias for the save button
-        function saveArticle() {
-            saveArticleToFirebase();
-        }
 
         async function loadSavedArticles() {
             const listContainer = document.getElementById('articleList');
