@@ -859,8 +859,20 @@
                         <option value="aws">AWS</option>
                         <option value="azure">Azure</option>
                         <option value="devops">DevOps</option>
+                        <option value="python">Python</option>
+                        <option value="javascript">JavaScript</option>
                         <option value="other">Other</option>
                     </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Visibility *</label>
+                        <select id="articleVisibility" class="form-select">
+                            <option value="public">Public</option>
+                            <option value="private">Private 🔒</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Short Description *</label>
@@ -1250,7 +1262,20 @@
                         document.getElementById('articleTitle').value = article.title;
                         document.getElementById('articleCategory').value = article.category;
                         document.getElementById('articleDescription').value = article.description;
-                        quill.root.innerHTML = article.content;
+
+                        // Load visibility
+                        document.getElementById('articleVisibility').value = article.visibility || 'public';
+                        document.getElementById('articleAccessPassword').value = article.accessPassword || '';
+                        toggleArticlePassword();
+
+                        // Set Quill content
+                        if (article.content) {
+                            const delta = quill.clipboard.convert(article.content);
+                            quill.setContents(delta, 'silent');
+                        } else {
+                            quill.root.innerHTML = '';
+                        }
+
                         uploadedImages = article.images || [];
                         renderImagePreviews();
                         showToast('Article loaded for editing');
@@ -1269,6 +1294,8 @@
                 const description = document.getElementById('articleDescription').value.trim();
                 const content = quill.root.innerHTML;
 
+                const visibility = document.getElementById('articleVisibility').value;
+
                 // Validation
                 if (!title) {
                     showToast('Please enter a title', true);
@@ -1282,6 +1309,9 @@
                     showToast('Please enter a description', true);
                     return;
                 }
+
+
+
                 if (quill.getText().trim().length < 10) {
                     showToast('Please add more content', true);
                     return;
@@ -1292,7 +1322,8 @@
                     category,
                     description,
                     content,
-                    images: uploadedImages
+                    images: uploadedImages,
+                    visibility: visibility || 'public'
                 };
 
                 try {
@@ -1405,9 +1436,13 @@
             function clearForm() {
                 editingArticleId = null;
                 document.getElementById('articleTitle').value = '';
-                document.getElementById('articleCategory').value = '';
+                document.getElementById('articleCategory').value = 'tech'; // Reset to default
                 document.getElementById('articleDescription').value = '';
-                quill.root.innerHTML = '';
+
+                // Reset visibility
+                document.getElementById('articleVisibility').value = 'public';
+
+                quill.setContents([]);
                 uploadedImages = [];
                 renderImagePreviews();
 
@@ -1572,6 +1607,29 @@
 
         // Focus on password input
         document.getElementById('editorPassword').focus();
+        // Toggle Article Password Field
+        function toggleArticlePassword() {
+            const visibility = document.getElementById('articleVisibility').value;
+            const passwordGroup = document.getElementById('articlePasswordGroup');
+
+            if (visibility === 'private') {
+                passwordGroup.style.display = 'block';
+            } else {
+                passwordGroup.style.display = 'none';
+            }
+        }
+        // Toggle Article Password Field
+        function toggleArticlePassword() {
+            const visibility = document.getElementById('articleVisibility').value;
+            const passwordGroup = document.getElementById('articlePasswordGroup');
+
+            if (visibility === 'private') {
+                passwordGroup.style.display = 'block';
+            } else {
+                passwordGroup.style.display = 'none';
+            }
+        }
+
     </script>
 </body>
 

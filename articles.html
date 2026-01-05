@@ -516,7 +516,10 @@
                         ${imageHtml}
                     </div>
                     <div class="article-content">
-                        <span class="article-category">${article.category}</span>
+                        <span class="article-category">
+                            ${article.category}
+                            ${article.visibility === 'private' ? '<i class="fas fa-lock" style="margin-left:5px;"></i>' : ''}
+                        </span>
                         <h3 class="article-title">${article.title}</h3>
                         <p class="article-description">${article.description}</p>
                         <div class="article-meta">
